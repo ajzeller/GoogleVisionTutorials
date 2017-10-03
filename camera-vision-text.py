@@ -35,8 +35,8 @@ def main():
                     'content': image_content.decode('UTF-8')
                 },
                 'features': [{
-                    'type': 'LABEL_DETECTION',
-                    'maxResults': 10
+                    'type': 'TEXT_DETECTION',
+                    'maxResults': 100
                 }]
             }]
         })
