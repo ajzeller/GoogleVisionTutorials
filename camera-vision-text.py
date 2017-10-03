@@ -34,10 +34,16 @@ def main():
                 'image': {
                     'content': image_content.decode('UTF-8')
                 },
-                'features': [{
-                    'type': 'TEXT_DETECTION',
-                    'maxResults': 100
-                }]
+                'features': [
+                    {
+                        'type': 'TEXT_DETECTION',
+                        'maxResults': 100
+                    },
+                    {
+                        'type': 'LABEL_DETECTION',
+                        'maxResults': 100
+                    }
+                ]
             }]
         })
         response = service_request.execute()
