@@ -38,7 +38,7 @@ def main():
                 'features': [
                     {
                         'type': 'TEXT_DETECTION',
-                        'maxResults': 100
+                        'maxResults': 500
                     },
                     {
                         'type': 'LABEL_DETECTION',
@@ -53,7 +53,7 @@ def main():
         image_text = response["responses"][0]["fullTextAnnotation"]["text"] # parse the text annotations from the image
         image_text = image_text.replace('\n',' ') # remove newlines from text annotations
         image_text = 'I found the following text: ' + image_text
-        image_labels = 'This object is most likely ' + response["responses"][0]["labelAnnotations"][0]["description"] + ', ' + response["responses"][0]["labelAnnotations"][1]["description"] + ', or ' + response["responses"][0]["labelAnnotations"][2]["description"] + '.'
+        image_labels = 'This object is most likely ' + response["responses"][0]["labelAnnotations"][0]["description"] + '.'
 
         print(image_text)
         print
