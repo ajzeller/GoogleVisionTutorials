@@ -18,6 +18,7 @@ from oauth2client.client import GoogleCredentials
 
 def takephoto():
     camera = picamera.PiCamera()
+    camera.resolution = (1600, 1200)
     camera.capture('image.jpg')
 
 def main():
