@@ -12,6 +12,7 @@ import argparse
 import base64
 import picamera
 import json
+import subprocess
 
 from googleapiclient import discovery
 from oauth2client.client import GoogleCredentials
@@ -22,6 +23,8 @@ def takephoto():
     camera.capture('image.jpg')
 
 def main():
+    start_time = time.time() # begin timer
+
     takephoto() # First take a picture
     """Run a label request on a single image"""
 
@@ -55,9 +58,19 @@ def main():
         image_text = 'I found the following text: ' + image_text
         image_labels = 'This object is most likely ' + response["responses"][0]["labelAnnotations"][0]["description"] + '.'
 
+        finish_time = time.time() # stop timer
+
+        elapsed = finish_time - start_time # calculate elapsed time
+
+        elapsed = 'Elapsed time: ' + str(round(elapsed, 3)) + ' seconds.'
+
         print(image_text)
         print
         print(image_labels)
+        print
+        print(elapsed)
+
+        subprocess.call('echo ' + image_text + ' ' + image_labels + ' |festival --tts', shell=True)
 
         # print json.dumps(response, indent=4, sort_keys=True)	#Print it out and make it somewhat pretty.
 
