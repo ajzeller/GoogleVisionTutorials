@@ -61,17 +61,20 @@ def main():
 
         finish_time = time.time() # stop timer
 
-        elapsed = finish_time - start_time # calculate elapsed time
 
-        elapsed = 'Elapsed time: ' + str(round(elapsed, 3)) + ' seconds.'
 
         print(image_text)
         print
         print(image_labels)
         print
+
+        elapsed = finish_time - start_time # calculate elapsed time
+
+        elapsed = 'Elapsed time: ' + str(round(elapsed, 3)) + ' seconds.'
+
         print(elapsed)
 
-        subprocess.call('echo ' + image_text + ' ' + image_labels + ' |festival --tts', shell=True)
+        # subprocess.call('echo ' + image_text + ' ' + image_labels + ' |festival --tts', shell=True)
 
         # print json.dumps(response, indent=4, sort_keys=True)	#Print it out and make it somewhat pretty.
 
