@@ -14,6 +14,8 @@ import picamera
 import json
 import subprocess
 import time
+import subprocess
+from gtts import gTTS
 import os
 
 from googleapiclient import discovery
@@ -22,7 +24,7 @@ from oauth2client.client import GoogleCredentials
 def takephoto():
     camera = picamera.PiCamera()
     camera.resolution = (1600, 1200) # sets camera resolution to 1600 x 1200 px
-    timestr = time.strftime("%m-%d-%Y_%H:%M:%S")
+    timestr = time.strftime("%m-%d-%Y_%H-%M-%S")
     img_filename = 'vf_capture_' + timestr + '.jpg'
     camera.capture(img_filename)
     return img_filename
@@ -69,7 +71,9 @@ def main():
 
         text_file = open(output_filename,'w')
 
-        text_file.write(voice_output_text + voice_output_labels) # writes the final output text to .txt file for narration
+        output_str = voice_output_text + voice_output_labels
+
+        text_file.write(output_str) # writes the final output text to .txt file for narration
         text_file.close()
 
         print(voice_output_text)
@@ -87,7 +91,17 @@ def main():
 
         tts_command = 'festival --tts ' + output_filename
 
-        os.system(tts_command) # runs TTS in command line
+        print(tts_command)
+
+        audio_output = gTTS(text=output_str, lang='en', slow=False)
+
+        audio_output_file = img_name_to_parse.rsplit( ".", 1 )[ 0 ] + '.mp3'
+
+        audio_output.save(audio_output_file)
+
+        os.system("mpg321 " + audio_output_file)
+
+        # subprocess(tts_command) # runs TTS in command line
 
         # subprocess.call('echo ' + image_text + ' ' + image_labels + ' |festival --tts', shell=True)
 
