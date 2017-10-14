@@ -14,6 +14,7 @@ import picamera
 import json
 import subprocess
 import time
+import os
 
 from googleapiclient import discovery
 from oauth2client.client import GoogleCredentials
@@ -21,18 +22,22 @@ from oauth2client.client import GoogleCredentials
 def takephoto():
     camera = picamera.PiCamera()
     camera.resolution = (1600, 1200) # sets camera resolution to 1600 x 1200 px
-    camera.capture('image.jpg')
+    timestr = time.strftime("%m-%d-%Y_%H:%M:%S")
+    img_filename = 'vf_capture_' + timestr + '.jpg'
+    camera.capture(img_filename)
+    return img_filename
 
 def main():
     start_time = time.time() # begin timer
 
-    takephoto() # First take a picture
+    img_name_to_parse = takephoto() # First take a picture
+
     """Run a label request on a single image"""
 
-    credentials = GoogleCredentials.get_application_default()
+    credentials = GoogleCredentials.get_application_default() # authentication credentials
     service = discovery.build('vision', 'v1', credentials=credentials)
 
-    with open('image.jpg', 'rb') as image:
+    with open(img_name_to_parse, 'rb') as image:
         image_content = base64.b64encode(image.read())
         service_request = service.images().annotate(body={
             'requests': [{
@@ -51,28 +56,38 @@ def main():
                 ]
             }]
         })
+
         response = service_request.execute()
         # api_response = json.load(response)
 
         image_text = response["responses"][0]["fullTextAnnotation"]["text"] # parse the text annotations from the image
         image_text = image_text.replace('\n',' ') # remove newlines from text annotations
-        image_text = 'I found the following text: ' + image_text
-        image_labels = 'This object is most likely ' + response["responses"][0]["labelAnnotations"][0]["description"] + '.'
+        voice_output_text = 'I found the following text: ' + image_text
+        voice_output_labels = 'This object is most likely ' + response["responses"][0]["labelAnnotations"][0]["description"] + '.'
+
+        output_filename = img_name_to_parse.rsplit( ".", 1 )[ 0 ] + '.txt' # creates new .txt file with same name as image capture
+
+        text_file = open(output_filename,'w')
+
+        text_file.write(voice_output_text + voice_output_labels) # writes the final output text to .txt file for narration
+        text_file.close()
+
+        print(voice_output_text)
+        print
+        print(voice_output_labels)
+        print
 
         finish_time = time.time() # stop timer
-
-
-
-        print(image_text)
-        print
-        print(image_labels)
-        print
 
         elapsed = finish_time - start_time # calculate elapsed time
 
         elapsed = 'Elapsed time: ' + str(round(elapsed, 3)) + ' seconds.'
 
         print(elapsed)
+
+        tts_command = 'festival --tts ' + output_filename
+
+        os.system(tts_command) # runs TTS in command line
 
         # subprocess.call('echo ' + image_text + ' ' + image_labels + ' |festival --tts', shell=True)
 
